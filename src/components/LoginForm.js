@@ -26,9 +26,16 @@ const LoginForm = () => {
             }
 
             const data = await response.json();
-            console.log('✅ Usuario:', data);
+            console.log('✅ Usuario autenticado:', data);
 
-            // Redirigir según rol
+            // Guardar el usuario en localStorage
+            localStorage.setItem('usuario', JSON.stringify({
+                nombre: data.nombre,
+                correo: data.correo,
+                rol: data.rol,
+            }));
+
+            // Redirigir según el rol
             switch (data.rol) {
                 case 'Administrador':
                     window.location.href = '/admin';
@@ -46,6 +53,7 @@ const LoginForm = () => {
                     setError('Rol no reconocido');
             }
         } catch (err) {
+            console.error('❌ Error de inicio de sesión:', err);
             setError(err.message);
         }
     };
