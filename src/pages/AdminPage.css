@@ -18,9 +18,14 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 18px 14px;
+    position: relative;
+    transition: width 300ms ease;
 }
 
-/* Encabezado superior del sidebar */
+.sidebar.collapsed {
+    width: 45px;
+}
+
 .sidebar-header {
     display: flex;
     align-items: center;
@@ -29,18 +34,25 @@
 }
 
 .sidebar-icon {
-    font-size: 1.3rem;
+    font-size: 1.45rem;
+}
+
+.menu-icon {
+    font-size: 1.37rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar-texts h2 {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 1.05rem;
+    font-weight: 500;
     margin: 0;
 }
 
 .sidebar-texts p {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     color: #d1d5db;
     margin: 0;
 }
@@ -66,14 +78,14 @@
     padding: 8px 10px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.90rem;
     transition: background 0.2s;
-    font-weight: 500;
 }
 
 .menu li:hover,
 .menu .active {
     background-color: #1e3a8a;
+    color: #2b79ff;
 }
 
 /* Opción de cierre de sesión */
@@ -93,34 +105,51 @@
     gap: 8px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+    /* Mejorar alineación vertical: asegurar centro exacto */
+    align-items: center;
+    /* ya estaba, reafirmado */
+    justify-content: flex-start;
+    /* mantener contenido alineado a la izquierda */
 }
 
 .avatar {
     background: #1e3a8a;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    /* ligero ajuste para simetría */
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     font-family: 'Poppins', sans-serif;
+    flex: 0 0 40px;
+    /* evitar que cambie de tamaño */
 }
 
 .user-details {
     display: flex;
     flex-direction: column;
-    line-height: 1.1;
+    justify-content: center;
+    line-height: 1;
+    margin: 0;
+    padding-left: 6px;
+    gap: 4px;
 }
 
 .user-name {
     font-weight: 500;
-    font-size: 0.83rem;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1;
 }
 
 .user-role {
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     color: #cbd5e1;
+    margin: 0;
+    line-height: 1;
 }
 
 /* ─── CONTENIDO PRINCIPAL ─────────────────────────────── */
@@ -345,6 +374,77 @@
     margin: 25px 0;
 }
 
+/* botón circular en el borde derecho, centrado verticalmente */
+.collapse-toggle {
+    position: absolute;
+    right: -15px;
+    /* centrado sobre el borde derecho del sidebar */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: #ffffff;
+    color: #0a285d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    z-index: 20;
+    user-select: none;
+}
+
+.sidebar.collapsed .sidebar-texts {
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+}
+
+/* esconder labels del menú manteniendo iconos, centrar iconos horizontalmente */
+.sidebar.collapsed .menu-text {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    display: inline-block;
+}
+
+/* centrar items del menu horizontalmente */
+.sidebar.collapsed .menu ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* centrar icono y quitar gap para que el icono quede en el centro */
+.sidebar.collapsed .menu li {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    gap: 0;
+    width: 100%;
+}
+
+/* centrar logo horizontalmente en header cuando esté collapsed */
+.sidebar.collapsed .sidebar-header {
+    justify-content: center;
+}
+
+/* cuando collapsed, ocultar detalles del usuario y centrar avatar */
+.sidebar.collapsed .user-details {
+    display: none;
+}
+
+.sidebar.collapsed .user-info {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
 /* 🔹 Responsivo */
 @media (max-width: 1024px) {
 
@@ -477,4 +577,74 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+/* Reglas específicas para la vista Gestión de Usuarios (mantienen estilos generales) */
+.users-page .users-header h2 {
+    margin: 0;
+    color: #0a285d;
+    font-family: 'Poppins', sans-serif;
+}
+
+.users-page .users-cards .stat-card {
+    min-height: 72px;
+}
+
+/* Tabla de usuarios */
+.users-table thead th {
+    text-align: left;
+    padding: 12px 10px;
+    color: #374151;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+    background: transparent;
+}
+
+.users-table tbody td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+    color: #374151;
+}
+
+/* Badges simples para rol/estado (puedes ajustar colores si quieres) */
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.role-profesor {
+    background: #0b1220;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.role-estudiante {
+    background: #eef2ff;
+    color: #3730a3;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.role-admin {
+    background: #ffebe6;
+    color: #9c0711;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.status-active {
+    background: #ecfdf5;
+    color: #065f46;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+/* Mantener que la vista respete el diseño existente */
+.users-panel {
+    margin-top: 12px;
 }

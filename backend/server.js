@@ -12,8 +12,8 @@ app.use(bodyParser.json());
 // Conexión a la base de datos
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root',         // ⚠️ cambia si tienes otro usuario
-    password: '',         // ⚠️ agrega tu contraseña si tienes
+    user: 'root',
+    password: '',
     database: 'proyecto_uni'
 });
 
