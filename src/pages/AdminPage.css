@@ -85,7 +85,6 @@
 .menu li:hover,
 .menu .active {
     background-color: #1e3a8a;
-    color: #2b79ff;
 }
 
 /* Opción de cierre de sesión */
@@ -644,7 +643,103 @@
     border-radius: 8px;
 }
 
-/* Mantener que la vista respete el diseño existente */
+/* Breadcrumb / header de Gestión de Usuarios */
+.users-breadcrumb .breadcrumb-path {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.users-breadcrumb .breadcrumb-title {
+    margin: 8px 0 4px 0;
+}
+
+.users-breadcrumb .breadcrumb-sub {
+    margin: 0;
+    color: #6b7280;
+}
+
+/* Contadores en users page */
+.users-cards {
+    display: flex;
+    gap: 14px;
+    margin: 18px 0 20px 0;
+}
+
+/* Asegura que las stat-card dentro de users-cards ocupen espacio igual */
+.users-cards .stat-card {
+    flex: 1 1 0;
+}
+
+/* Panel principal de la vista de usuarios */
 .users-panel {
-    margin-top: 12px;
+    background: white;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Top del panel: búsqueda y acciones */
+.users-panel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+/* contenedor del input de búsqueda (ocupa el espacio izquierdo) */
+.users-panel-search {
+    flex: 1;
+}
+
+/* input de búsqueda */
+.search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+/* select de filtro */
+.users-filter-select {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: white;
+}
+
+/* contenedor de acciones (select + botón) */
+.users-panel-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* botón crear usuario */
+.btn-create {
+    background: #0a285d;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* wrapper de la tabla */
+.users-table-wrapper {
+    margin-top: 18px;
+}
+
+/* tabla de usuarios */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* pequeño dentro de la celda (email) */
+.users-table td small {
+    color: #6b7280;
 }
