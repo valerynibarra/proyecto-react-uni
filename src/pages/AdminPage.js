@@ -21,6 +21,12 @@ const AdminPage = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [activePage, setActivePage] = useState("dashboard"); // "dashboard" | "users"
 
+    // Datos conectados al backend (incluye administradores)
+    const [counts, setCounts] = useState({ totalUsers: 0, estudiantes: 0, profesores: 0, administradores: 0 });
+    const [users, setUsers] = useState([]);
+    const [usersLoading, setUsersLoading] = useState(false);
+    const [usersQuery, setUsersQuery] = useState({ q: "", role: "Todos" });
+
     // Cargar usuario guardado
     useEffect(() => {
         const storedUser = localStorage.getItem("usuario");
@@ -44,6 +50,47 @@ const AdminPage = () => {
     };
 
     const toggleCollapsed = () => setCollapsed((s) => !s);
+
+    // Obtener counts para dashboard y cards de Gestión de Usuarios
+    useEffect(() => {
+        let mounted = true;
+        async function fetchCounts() {
+            try {
+                const res = await fetch("http://localhost:5000/counts");
+                if (!res.ok) throw new Error("Error counts");
+                const data = await res.json();
+                if (mounted) setCounts(data);
+            } catch (err) {
+                console.error("No se pudieron obtener counts:", err);
+            }
+        }
+        fetchCounts();
+        return () => { mounted = false; };
+    }, []);
+
+    // Obtener lista de usuarios cuando se abre la vista o cambian filtros
+    useEffect(() => {
+        if (activePage !== "users") return;
+        let mounted = true;
+        async function fetchUsers() {
+            try {
+                setUsersLoading(true);
+                const params = new URLSearchParams();
+                if (usersQuery.q) params.append("q", usersQuery.q);
+                if (usersQuery.role) params.append("role", usersQuery.role);
+                const res = await fetch(`http://localhost:5000/usuarios?${params.toString()}`);
+                if (!res.ok) throw new Error("Error usuarios");
+                const data = await res.json();
+                if (mounted) setUsers(data);
+            } catch (err) {
+                console.error("No se pudieron obtener usuarios:", err);
+            } finally {
+                if (mounted) setUsersLoading(false);
+            }
+        }
+        fetchUsers();
+        return () => { mounted = false; };
+    }, [activePage, usersQuery.q, usersQuery.role]);
 
     return (
         <div className="admin-dashboard">
@@ -124,45 +171,45 @@ const AdminPage = () => {
                         {/* Cabecera / breadcrumb */}
                         <div className="users-header">
                             <div className="users-breadcrumb">
-                                <p style={{ margin: 0, color: "#6b7280", fontSize: "0.9rem" }}>Inicio / Gestión de Usuarios</p>
-                                <h2 style={{ margin: "8px 0 4px 0" }}>Gestión de Usuarios</h2>
-                                <p style={{ margin: 0, color: "#6b7280" }}>Administra usuarios del sistema académico</p>
+                                <p className="breadcrumb-path">Inicio / Gestión de Usuarios</p>
+                                <h2 className="breadcrumb-title">Gestión de Usuarios</h2>
+                                <p className="breadcrumb-sub">Administra usuarios del sistema académico</p>
                             </div>
                         </div>
 
                         {/* Contadores superiores (reutilizan stat-card) */}
-                        <div className="users-cards" style={{ display: "flex", gap: 14, margin: "18px 0 20px 0" }}>
-                            <div className="stat-card" style={{ flex: "1 1 0" }}>
+                        <div className="users-cards">
+                            <div className="stat-card">
                                 <div>
                                     <p>Total Usuarios</p>
-                                    <h2>5</h2>
+                                    <h2>{counts.totalUsers?.toLocaleString() ?? "-"}</h2>
                                 </div>
                                 <div className="icon-box blue">
                                     <FaUsers />
                                 </div>
                             </div>
-                            <div className="stat-card" style={{ flex: "1 1 0" }}>
+                            <div className="stat-card">
                                 <div>
                                     <p>Estudiantes</p>
-                                    <h2>2</h2>
+                                    <h2>{counts.estudiantes?.toLocaleString() ?? "-"}</h2>
                                 </div>
                                 <div className="icon-box purple">
                                     <FaGraduationCap />
                                 </div>
                             </div>
-                            <div className="stat-card" style={{ flex: "1 1 0" }}>
+                            <div className="stat-card">
                                 <div>
                                     <p>Profesores</p>
-                                    <h2>2</h2>
+                                    <h2>{counts.profesores?.toLocaleString() ?? "-"}</h2>
                                 </div>
                                 <div className="icon-box orange">
                                     <FaBookOpen />
                                 </div>
                             </div>
-                            <div className="stat-card" style={{ flex: "1 1 0" }}>
+                            <div className="stat-card">
                                 <div>
                                     <p>Administradores</p>
-                                    <h2>1</h2>
+                                    <h2>{counts.administradores?.toLocaleString() ?? "-"}</h2>
                                 </div>
                                 <div className="icon-box green">
                                     <FaUsers />
@@ -171,88 +218,74 @@ const AdminPage = () => {
                         </div>
 
                         {/* Panel con búsqueda, filtro y botón crear */}
-                        <div className="users-panel" style={{ background: "white", padding: 18, borderRadius: 10, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-                            <div className="users-panel-top" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-                                <div style={{ flex: 1 }}>
-                                    <input className="search-input" placeholder="Buscar por nombre o email..." style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }} />
+                        <div className="users-panel">
+                            <div className="users-panel-top">
+                                <div className="users-panel-search">
+                                    <input
+                                        className="search-input"
+                                        placeholder="Buscar por nombre o email..."
+                                        value={usersQuery.q}
+                                        onChange={(e) => setUsersQuery((s) => ({ ...s, q: e.target.value }))}
+                                    />
                                 </div>
-                                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                                    <select style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #e5e7eb" }}>
-                                        <option>Filtrar por rol</option>
+                                <div className="users-panel-actions">
+                                    <select
+                                        className="users-filter-select"
+                                        value={usersQuery.role}
+                                        onChange={(e) => setUsersQuery((s) => ({ ...s, role: e.target.value }))}
+                                    >
                                         <option>Todos</option>
                                         <option>Estudiante</option>
                                         <option>Profesor</option>
                                         <option>Administrador</option>
                                     </select>
-                                    <button className="btn-create" style={{ background: "#0a285d", color: "#fff", padding: "10px 14px", borderRadius: 8, border: "none" }}>
+                                    <button className="btn-create">
                                         <FaUserPlus style={{ marginRight: 8 }} /> Crear Usuario
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Tabla de usuarios (ejemplo estático) */}
-                            <div style={{ marginTop: 18 }}>
-                                <table className="users-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+                            {/* Tabla de usuarios (ahora dinámico) */}
+                            <div className="users-table-wrapper">
+                                <table className="users-table">
                                     <thead>
                                         <tr>
                                             <th>Usuario</th>
                                             <th>Rol</th>
-                                            <th>Programa/Especialización</th>
-                                            <th>Estado</th>
-                                            <th>Fecha de Registro</th>
+                                            <th>Correo</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <div style={{ display: "flex", flexDirection: "column" }}>
-                                                    <strong>María García López</strong>
-                                                    <small style={{ color: "#6b7280" }}>m.garcia@somospensadores.edu.co</small>
-                                                </div>
-                                            </td>
-                                            <td><span className="badge role-profesor">Profesor</span></td>
-                                            <td>Matemáticas</td>
-                                            <td><span className="badge status-active">activo</span></td>
-                                            <td>14/1/2024</td>
-                                            <td>👁️ ✏️ 🗑️</td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div style={{ display: "flex", flexDirection: "column" }}>
-                                                    <strong>Carlos Rodríguez Pérez</strong>
-                                                    <small style={{ color: "#6b7280" }}>c.rodriguez@somospensadores.edu.co</small>
-                                                </div>
-                                            </td>
-                                            <td><span className="badge role-estudiante">Estudiante</span></td>
-                                            <td>Ingeniería de Sistemas</td>
-                                            <td><span className="badge status-active">activo</span></td>
-                                            <td>19/2/2024</td>
-                                            <td>👁️ ✏️ 🗑️</td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div style={{ display: "flex", flexDirection: "column" }}>
-                                                    <strong>Patricia Morales Vega</strong>
-                                                    <small style={{ color: "#6b7280" }}>p.morales@somospensadores.edu.co</small>
-                                                </div>
-                                            </td>
-                                            <td><span className="badge role-admin">Administrador</span></td>
-                                            <td>-</td>
-                                            <td><span className="badge status-active">activo</span></td>
-                                            <td>30/11/2023</td>
-                                            <td>👁️ ✏️ 🗑️</td>
-                                        </tr>
+                                        {usersLoading ? (
+                                            <tr><td colSpan={4}>Cargando...</td></tr>
+                                        ) : users.length === 0 ? (
+                                            <tr><td colSpan={4}>No se encontraron usuarios</td></tr>
+                                        ) : (
+                                            users.map((u) => (
+                                                <tr key={u.id}>
+                                                    <td>
+                                                        <div className="user-cell">
+                                                            <strong>{u.nombre}</strong>
+                                                            <small>{u.correo}</small>
+                                                        </div>
+                                                    </td>
+                                                    <td><span className={`badge ${u.rol === 'Profesor' ? 'role-profesor' : u.rol === 'Estudiante' ? 'role-estudiante' : 'role-admin'}`}>{u.rol}</span></td>
+                                                    <td>{u.correo}</td>
+                                                    <td>👁️ ✏️ 🗑️</td>
+                                                </tr>
+                                            ))
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </section>
                 ) : (
-                    /* Inicio: contenido ORIGINAL sin cambios */
+
                     <>
                         <header className="header">
-                            <h1>¡Bienvenido, {usuario.nombre || "Usuario"}!</h1>
+                            <h1>¡Hola, {usuario.nombre || "Usuario"}!</h1>
                             <p>Panel de administración - Universidad SOMOSPENSADORES</p>
                         </header>
 
@@ -261,7 +294,7 @@ const AdminPage = () => {
                             <div className="stat-card blue">
                                 <div>
                                     <p>Total Usuarios</p>
-                                    <h2>1,247</h2>
+                                    <h2>{counts.totalUsers?.toLocaleString() ?? "-"}</h2>
                                 </div>
                                 <div className="icon-box blue">
                                     <FaUsers />
@@ -281,7 +314,7 @@ const AdminPage = () => {
                             <div className="stat-card purple">
                                 <div>
                                     <p>Estudiantes</p>
-                                    <h2>1,089</h2>
+                                    <h2>{counts.estudiantes?.toLocaleString() ?? "-"}</h2>
                                 </div>
                                 <div className="icon-box purple">
                                     <FaGraduationCap />
@@ -291,7 +324,7 @@ const AdminPage = () => {
                             <div className="stat-card orange">
                                 <div>
                                     <p>Profesores</p>
-                                    <h2>87</h2>
+                                    <h2>{counts.profesores?.toLocaleString() ?? "-"}</h2>
                                 </div>
                                 <div className="icon-box orange">
                                     <FaUsers />
