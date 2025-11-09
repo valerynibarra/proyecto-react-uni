@@ -12,6 +12,11 @@ import {
     FaUserPlus,
     FaPlus,
     FaChartLine,
+    FaEye,
+    FaEdit,
+    FaTrash,
+    FaSearch,
+    FaChevronDown,
 } from "react-icons/fa";
 import confirmLogout from "../utils/confirmLogout";
 import "./AdminPage.css";
@@ -219,8 +224,23 @@ const AdminPage = () => {
 
                         {/* Panel con búsqueda, filtro y botón crear */}
                         <div className="users-panel">
-                            <div className="users-panel-top">
-                                <div className="users-panel-search">
+                            {/* header del panel: título a la izquierda, botón crear a la derecha */}
+                            <div className="users-panel-header">
+                                <div className="users-panel-title">
+                                    <div className="users-panel-heading">Lista de Usuarios</div>
+                                    <div className="users-panel-subheading">Gestiona todos los usuarios del sistema</div>
+                                </div>
+                                <div className="users-panel-create">
+                                    <button className="btn-create">
+                                        <FaUserPlus /> Crear Usuario
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* controles: búsqueda (izq) y filtro (der) */}
+                            <div className="users-panel-controls">
+                                <div className="search-wrapper">
+                                    <FaSearch className="search-icon" aria-hidden="true" />
                                     <input
                                         className="search-input"
                                         placeholder="Buscar por nombre o email..."
@@ -228,7 +248,7 @@ const AdminPage = () => {
                                         onChange={(e) => setUsersQuery((s) => ({ ...s, q: e.target.value }))}
                                     />
                                 </div>
-                                <div className="users-panel-actions">
+                                <div className="select-wrapper">
                                     <select
                                         className="users-filter-select"
                                         value={usersQuery.role}
@@ -238,10 +258,9 @@ const AdminPage = () => {
                                         <option>Estudiante</option>
                                         <option>Profesor</option>
                                         <option>Administrador</option>
+                                        <option>Director de Programa Académico</option>
                                     </select>
-                                    <button className="btn-create">
-                                        <FaUserPlus style={{ marginRight: 8 }} /> Crear Usuario
-                                    </button>
+                                    <FaChevronDown className="select-arrow" aria-hidden="true" />
                                 </div>
                             </div>
 
@@ -252,7 +271,6 @@ const AdminPage = () => {
                                         <tr>
                                             <th>Usuario</th>
                                             <th>Rol</th>
-                                            <th>Correo</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -266,13 +284,16 @@ const AdminPage = () => {
                                                 <tr key={u.id}>
                                                     <td>
                                                         <div className="user-cell">
-                                                            <strong>{u.nombre}</strong>
-                                                            <small>{u.correo}</small>
+                                                            <strong className="user-name-line">{u.nombre}</strong>
+                                                            <small className="user-email-line">{u.correo}</small>
                                                         </div>
                                                     </td>
-                                                    <td><span className={`badge ${u.rol === 'Profesor' ? 'role-profesor' : u.rol === 'Estudiante' ? 'role-estudiante' : 'role-admin'}`}>{u.rol}</span></td>
-                                                    <td>{u.correo}</td>
-                                                    <td>👁️ ✏️ 🗑️</td>
+                                                    <td className="role-cell">{u.rol}</td>
+                                                    <td className="actions-cell">
+                                                        <FaEye className="table-action-icon" aria-label="ver" />
+                                                        <FaEdit className="table-action-icon" aria-label="editar" />
+                                                        <FaTrash className="table-action-icon" aria-label="eliminar" />
+                                                    </td>
                                                 </tr>
                                             ))
                                         )}

@@ -695,20 +695,61 @@
 /* input de búsqueda */
 .search-input {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    padding: 10px 14px 10px 36px;
+    /* espacio izquierdo para el icono */
+    border-radius: 12px;
+    border: none;
+    background: #f3f4f6;
+    color: #111827;
+    box-shadow: none;
+    outline: none;
 }
 
-/* select de filtro */
+/* wrapper para la búsqueda con icono */
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+/* select con wrapper que incluye la flecha */
+.select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
 .users-filter-select {
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: white;
+    padding: 10px 38px 10px 12px;
+    /* espacio derecho para la flecha */
+    border-radius: 12px;
+    border: none;
+    background: #f3f4f6;
+    color: #111827;
+    min-width: 160px;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
-/* contenedor de acciones (select + botón) */
+/* icono de flecha posicionado a la derecha del select */
+.select-arrow {
+    position: absolute;
+    right: 12px;
+    color: #6b7280;
+    pointer-events: none;
+    font-size: 14px;
+}
+
+/* Alineamiento para acciones del panel (solo select aquí) */
 .users-panel-actions {
     display: flex;
     gap: 12px;
@@ -742,4 +783,61 @@
 /* pequeño dentro de la celda (email) */
 .users-table td small {
     color: #6b7280;
+}
+
+/* Panel header dentro de users-panel */
+.users-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.users-panel-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.users-panel-heading {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.05rem;
+    color: #0a285d;
+    font-weight: 600;
+}
+
+.users-panel-subheading {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* controles (fila con búsqueda y select) */
+.users-panel-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    /* más espacio entre búsqueda y filtro */
+    margin-bottom: 12px;
+}
+
+/* tabla: ajustar celdas y separación entre nombre y correo */
+.users-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+/* asegurar que los iconos de acciones estén centrados verticalmente */
+.table-action-icon {
+    color: #374151;
+    font-size: 16px;
+    cursor: pointer;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+/* eliminar regla de email-cell (si existiera ocultación previa) */
+.email-cell {
+    display: none !important;
 }
