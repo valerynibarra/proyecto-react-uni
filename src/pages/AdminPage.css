@@ -578,7 +578,7 @@
     }
 }
 
-/* Reglas específicas para la vista Gestión de Usuarios (mantienen estilos generales) */
+/* Estilos vista Gestión de Usuarios */
 .users-page .users-header h2 {
     margin: 0;
     color: #0a285d;
@@ -696,7 +696,6 @@
 .search-input {
     width: 100%;
     padding: 10px 14px 10px 36px;
-    /* espacio izquierdo para el icono */
     border-radius: 12px;
     border: none;
     background: #f3f4f6;
@@ -705,7 +704,6 @@
     outline: none;
 }
 
-/* wrapper para la búsqueda con icono */
 .search-wrapper {
     position: relative;
     flex: 1;
@@ -721,7 +719,6 @@
     pointer-events: none;
 }
 
-/* select con wrapper que incluye la flecha */
 .select-wrapper {
     position: relative;
     display: inline-flex;
@@ -730,7 +727,6 @@
 
 .users-filter-select {
     padding: 10px 38px 10px 12px;
-    /* espacio derecho para la flecha */
     border-radius: 12px;
     border: none;
     background: #f3f4f6;
@@ -740,7 +736,6 @@
     -webkit-appearance: none;
 }
 
-/* icono de flecha posicionado a la derecha del select */
 .select-arrow {
     position: absolute;
     right: 12px;
@@ -749,7 +744,6 @@
     font-size: 14px;
 }
 
-/* Alineamiento para acciones del panel (solo select aquí) */
 .users-panel-actions {
     display: flex;
     gap: 12px;
@@ -769,7 +763,6 @@
     cursor: pointer;
 }
 
-/* wrapper de la tabla */
 .users-table-wrapper {
     margin-top: 18px;
 }
@@ -780,12 +773,10 @@
     border-collapse: collapse;
 }
 
-/* pequeño dentro de la celda (email) */
 .users-table td small {
     color: #6b7280;
 }
 
-/* Panel header dentro de users-panel */
 .users-panel-header {
     display: flex;
     justify-content: space-between;
@@ -811,33 +802,261 @@
     font-size: 0.9rem;
 }
 
-/* controles (fila con búsqueda y select) */
 .users-panel-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 24px;
-    /* más espacio entre búsqueda y filtro */
     margin-bottom: 12px;
 }
 
-/* tabla: ajustar celdas y separación entre nombre y correo */
 .users-table td {
     padding: 12px 10px;
     border-bottom: 1px solid #f3f4f6;
     vertical-align: middle;
 }
 
-/* asegurar que los iconos de acciones estén centrados verticalmente */
 .table-action-icon {
-    color: #374151;
-    font-size: 16px;
+    font-size: 18px;
     cursor: pointer;
     vertical-align: middle;
     line-height: 1;
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
-/* eliminar regla de email-cell (si existiera ocultación previa) */
+.edit-icon {
+    color: #16a34a;
+    margin-right: 10px;
+}
+
+.edit-icon:hover {
+    color: #15803d;
+    transform: scale(1.1);
+}
+
+.delete-icon {
+    color: #dc2626;
+}
+
+.delete-icon:hover {
+    color: #b91c1c;
+    transform: scale(1.1);
+}
+
+.actions-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+
+
 .email-cell {
     display: none !important;
+}
+
+/* Estilos para el modal de crear usuario */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 420px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.modal-content h2 {
+    margin: 0;
+    color: #0a285d;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+}
+
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.create-user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.create-user-form label {
+    color: #000000a4;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.create-user-form input,
+.create-user-form select {
+    background-color: #f3f4f6;
+    border: 1px solid #fff;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 0.95rem;
+    color: #333;
+    font-family: 'Inter', sans-serif;
+    transition: border 0.2s ease;
+}
+
+.create-user-form input::placeholder {
+    color: #9ca3af;
+}
+
+.create-user-form input:focus,
+.create-user-form select:focus {
+    outline: none;
+    background-color: #fff;
+    border-color: #d1d5db;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.2rem;
+}
+
+.btn-primary {
+    background: #0a285d;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.2s ease;
+    width: 48%;
+}
+
+.btn-primary:hover {
+    background: #0c3270;
+}
+
+.btn-secondary {
+    background: #cc131349;
+    color: #811010;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.2s ease, border 0.2s ease;
+    width: 48%;
+}
+
+.btn-secondary:hover {
+    background: #cc131362;
+    color: #811010;
+}
+
+.error-msg {
+    color: red;
+    font-size: 0.9rem;
+}
+
+.success-msg {
+    color: green;
+    font-size: 0.9rem;
+}
+
+/* === MODAL DE ELIMINACIÓN === */
+.delete-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.delete-modal-content {
+    background: #fff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.delete-modal-content h3 {
+    color: #0a285d;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.delete-modal-content p {
+    font-size: 1rem;
+    color: #374151;
+    margin-bottom: 20px;
+}
+
+.delete-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-cancelar {
+    background-color: #d1d5db;
+    color: #111827;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-cancelar:hover {
+    background-color: #9ca3af;
+}
+
+.btn-eliminar {
+    background-color: #ef4444;
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-eliminar:hover {
+    background-color: #dc2626;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

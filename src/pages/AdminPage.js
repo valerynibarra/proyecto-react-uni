@@ -12,11 +12,11 @@ import {
     FaUserPlus,
     FaPlus,
     FaChartLine,
-    FaEye,
     FaEdit,
     FaTrash,
     FaSearch,
     FaChevronDown,
+    FaTimes,
 } from "react-icons/fa";
 import confirmLogout from "../utils/confirmLogout";
 import "./AdminPage.css";
@@ -24,9 +24,38 @@ import "./AdminPage.css";
 const AdminPage = () => {
     const [usuario, setUsuario] = useState({ nombre: "", rol: "" });
     const [collapsed, setCollapsed] = useState(false);
-    const [activePage, setActivePage] = useState("dashboard"); // "dashboard" | "users"
+    const [activePage, setActivePage] = useState("dashboard");
 
-    // Datos conectados al backend (incluye administradores)
+    // Crear usuario
+    const [showModal, setShowModal] = useState(false);
+    const [programas, setProgramas] = useState([]);
+    const [newUser, setNewUser] = useState({
+        nombre: "",
+        documento: "",
+        correo: "",
+        programa: "",
+        rol: ""
+    });
+    const [errorMsg, setErrorMsg] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
+
+    //cargar los programas
+    useEffect(() => {
+        async function fetchProgramas() {
+            try {
+                const res = await fetch("http://localhost:5000/programas");
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                setProgramas(data);
+            } catch {
+                console.error("No se pudieron cargar los programas");
+            }
+        }
+        fetchProgramas();
+    }, []);
+
+
+    // Datos conectados al backend
     const [counts, setCounts] = useState({ totalUsers: 0, estudiantes: 0, profesores: 0, administradores: 0 });
     const [users, setUsers] = useState([]);
     const [usersLoading, setUsersLoading] = useState(false);
@@ -96,6 +125,85 @@ const AdminPage = () => {
         fetchUsers();
         return () => { mounted = false; };
     }, [activePage, usersQuery.q, usersQuery.role]);
+
+    // Función para crear nuevo usuario
+    const handleCreateUser = async (e) => {
+        e.preventDefault();
+        setErrorMsg("");
+        setSuccessMsg("");
+
+        try {
+            const res = await fetch("http://localhost:5000/usuarios", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newUser),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Error al crear usuario");
+
+            setSuccessMsg(`Usuario creado correctamente. Contraseña temporal: ${data.contraseñaTemporal}`);
+            setNewUser({ nombre: "", documento: "", correo: "", programa: "", rol: "" });
+
+            // Actualiza la lista de usuarios
+            await refreshData();
+            setTimeout(() => setShowModal(false), 2500);
+        } catch (err) {
+            setErrorMsg(err.message);
+        }
+    };
+
+
+    // Nuevo estado para el modal de eliminación
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+
+    // Función para abrir el modal con el usuario seleccionado
+    const handleDeleteClick = (usuario) => {
+        setUserToDelete(usuario);
+        setShowDeleteModal(true);
+    };
+
+    // Función para confirmar eliminación
+    const confirmDeleteUser = async () => {
+        if (!userToDelete) return;
+
+        try {
+            const res = await fetch(`http://localhost:5000/usuarios/${userToDelete.id}`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || "Error al eliminar usuario");
+
+            // Refresca la lista de usuarios
+            await refreshData();
+            setShowDeleteModal(false);
+            setUserToDelete(null);
+        } catch (error) {
+            console.error("❌ Error al eliminar usuario:", error);
+            alert("No se pudo eliminar el usuario.");
+        }
+    };
+
+    const refreshData = async () => {
+        try {
+            //  Refrescar lista de usuarios
+            const params = new URLSearchParams();
+            if (usersQuery.q) params.append("q", usersQuery.q);
+            if (usersQuery.role) params.append("role", usersQuery.role);
+            const resUsers = await fetch(`http://localhost:5000/usuarios?${params.toString()}`);
+            const dataUsers = await resUsers.json();
+            setUsers(dataUsers);
+
+            //  Refrescar contadores
+            const resCounts = await fetch("http://localhost:5000/counts");
+            const dataCounts = await resCounts.json();
+            setCounts(dataCounts);
+        } catch (error) {
+            console.error("Error al refrescar datos:", error);
+        }
+    };
 
     return (
         <div className="admin-dashboard">
@@ -231,7 +339,7 @@ const AdminPage = () => {
                                     <div className="users-panel-subheading">Gestiona todos los usuarios del sistema</div>
                                 </div>
                                 <div className="users-panel-create">
-                                    <button className="btn-create">
+                                    <button className="btn-create" onClick={() => setShowModal(true)}>
                                         <FaUserPlus /> Crear Usuario
                                     </button>
                                 </div>
@@ -264,13 +372,16 @@ const AdminPage = () => {
                                 </div>
                             </div>
 
-                            {/* Tabla de usuarios (ahora dinámico) */}
+                            {/* Tabla de usuarios */}
                             <div className="users-table-wrapper">
                                 <table className="users-table">
                                     <thead>
                                         <tr>
                                             <th>Usuario</th>
+                                            <th>Documento</th>
                                             <th>Rol</th>
+                                            <th>Programa</th>
+                                            <th>Fecha de Registro</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -284,15 +395,21 @@ const AdminPage = () => {
                                                 <tr key={u.id}>
                                                     <td>
                                                         <div className="user-cell">
-                                                            <strong className="user-name-line">{u.nombre}</strong>
+                                                            <strong className="user-name-line">{u.nombre}</strong><br></br>
                                                             <small className="user-email-line">{u.correo}</small>
                                                         </div>
                                                     </td>
+                                                    <td>{u.documento}</td>
                                                     <td className="role-cell">{u.rol}</td>
+                                                    <td>{u.programa ?? '-'}</td>
+                                                    <td>{u.fecha_registro}</td>
                                                     <td className="actions-cell">
-                                                        <FaEye className="table-action-icon" aria-label="ver" />
-                                                        <FaEdit className="table-action-icon" aria-label="editar" />
-                                                        <FaTrash className="table-action-icon" aria-label="eliminar" />
+                                                        <FaEdit className="table-action-icon edit-icon" aria-label="editar" />
+                                                        <FaTrash
+                                                            className="table-action-icon delete-icon"
+                                                            aria-label="eliminar"
+                                                            onClick={() => handleDeleteClick(u)}
+                                                        />
                                                     </td>
                                                 </tr>
                                             ))
@@ -400,6 +517,94 @@ const AdminPage = () => {
                     </>
                 )}
             </main>
+
+            {/* Modal para crear nuevo usuario */}
+
+            {showModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <button className="close-btn" onClick={() => setShowModal(false)}>
+                            <FaTimes />
+                        </button>
+                        <h2>Crear Nuevo Usuario</h2>
+                        <form onSubmit={handleCreateUser} className="create-user-form">
+                            <label>Nombre Completo</label>
+                            <input
+                                type="text"
+                                placeholder="Nombre completo del usuario"
+                                value={newUser.nombre}
+                                onChange={(e) => setNewUser({ ...newUser, nombre: e.target.value })}
+                                required
+                            />
+
+                            <label>Documento</label>
+                            <input
+                                type="number"
+                                placeholder="Número de documento"
+                                value={newUser.documento}
+                                onChange={(e) => setNewUser({ ...newUser, documento: e.target.value })}
+                                required
+                            />
+
+                            <label>Correo Institucional</label>
+                            <input
+                                type="email"
+                                placeholder="correo@somospensadores.edu.co"
+                                value={newUser.correo}
+                                onChange={(e) => setNewUser({ ...newUser, correo: e.target.value })}
+                                required
+                            />
+
+                            <label>Programa Académico</label>
+                            <select
+                                value={newUser.programa}
+                                onChange={(e) => setNewUser({ ...newUser, programa: e.target.value })}
+                            >
+                                <option value="">-- Seleccionar programa --</option>
+                                {programas.map((p) => (
+                                    <option key={p.id} value={p.nombre}>{p.nombre}</option>
+                                ))}
+                            </select>
+
+                            <label>Rol</label>
+                            <select
+                                value={newUser.rol}
+                                onChange={(e) => setNewUser({ ...newUser, rol: e.target.value })}
+                                required
+                            >
+                                <option value="">Seleccionar rol</option>
+                                <option>Administrador</option>
+                                <option>Director de Programa Académico</option>
+                                <option>Profesor</option>
+                                <option>Estudiante</option>
+                            </select>
+
+                            {errorMsg && <p className="error-msg">{errorMsg}</p>}
+                            {successMsg && <p className="success-msg">{successMsg}</p>}
+
+                            <div className="modal-buttons">
+                                <button type="submit" className="btn-primary">Crear Usuario</button>
+                                <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de confirmación de eliminación */}
+            {showDeleteModal && (
+                <div className="delete-modal-overlay">
+                    <div className="delete-modal-content">
+                        <h3>Confirmar eliminación</h3>
+                        <p>¿Seguro que deseas eliminar al usuario <strong>{userToDelete?.nombre}</strong>?</p>
+                        <div className="delete-modal-buttons">
+                            <button className="btn-cancelar" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
+                            <button className="btn-eliminar" onClick={confirmDeleteUser}>Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
