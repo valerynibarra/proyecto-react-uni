@@ -103,7 +103,7 @@ const LoginForm = () => {
                     <hr className="divider" />
 
                     <p className="login-footer">
-                        ¿No tienes una cuenta? <a href="#">Regístrate aquí</a>
+                        
                     </p>
                 </form>
             </div>
